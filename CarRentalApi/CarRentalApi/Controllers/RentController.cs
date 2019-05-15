@@ -23,6 +23,13 @@ namespace CarRentalApi.Controllers
 
         [HttpGet]
         [Route("cars")]
+        public ActionResult<IEnumerable<Car>> GetAllCars()
+        {
+            return Ok(_rentService.GetAllCars());
+        }
+
+        [HttpGet]
+        [Route("availableCars")]
         public ActionResult<IEnumerable<Car>> GetAvaibleCars([FromBody]DateFromToDTO dateFromTo)
         {
             if (!ModelState.IsValid)
@@ -30,6 +37,13 @@ namespace CarRentalApi.Controllers
                 return ValidationProblem(ModelState);
             }
             return Ok(_rentService.GetAvailableCars(dateFromTo.PickUpDate, dateFromTo.ReturnDate));
+        }
+
+        [HttpGet]
+        [Route("rentals")]
+        public ActionResult<IEnumerable<ReservationDetailDTO>> GetAllRentals()
+        {          
+            return Ok(_rentService.GetAllReservation());
         }
 
         [HttpGet]
@@ -49,7 +63,12 @@ namespace CarRentalApi.Controllers
             {
                 return NotFound("Reservation not found");
             }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
         }
+
         [HttpPatch]
         public ActionResult<ReservationDetailDTO> UpdateReservation([FromBody] Reservation reservation)
         {
@@ -66,6 +85,10 @@ namespace CarRentalApi.Controllers
             catch (ArgumentNullException)
             {
                 return NotFound("Reservation not found");
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
             }
         }
 
@@ -85,6 +108,10 @@ namespace CarRentalApi.Controllers
             catch (ArgumentNullException)
             {
                 return NotFound("Reservation not found");
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
             }
         }
 

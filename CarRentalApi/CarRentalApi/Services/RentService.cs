@@ -17,7 +17,10 @@ namespace CarRentalApi.Services
         {
             _context = context;
         }
-
+        public List<Car> GetAllCars()
+        {
+            return _context.Cars.ToList();
+        }
         public List<Car> GetAvailableCars(DateTime pickUpDate, DateTime returnDate)
         {
             var avaibleCars = _context.Cars.Where(car => !_context.Reservations.Any(r => r.CarId == car.Id && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate)).ToList();
@@ -37,6 +40,10 @@ namespace CarRentalApi.Services
             if (foundReservation == null)
                 throw new ArgumentNullException("Reservation does not exists");
             return ReservationToDTO(foundReservation);
+        }
+        public List<ReservationDetailDTO> GetAllReservation()
+        {
+            return _context.Reservations.Include(c => c.Car).Select(ReservationToDTO).ToList();
         }
 
         public ReservationDetailDTO UpdateReservation(Reservation reservation)
