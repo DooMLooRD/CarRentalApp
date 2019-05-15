@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CarRentalApi.DTOs
 {
-    public class ReservationDTO
+    public class ReservationIndexDTO
     {
         public int ReservationNumber { get; set; }
         public string Surname { get; set; }

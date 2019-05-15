@@ -23,31 +23,31 @@ namespace CarRentalApi.Controllers
 
         [HttpGet]
         [Route("cars")]
-        public ActionResult<IEnumerable<Car>> GetAllCars()
+        public async Task<ActionResult<IEnumerable<Car>>> GetAllCars()
         {
-            return Ok(_rentService.GetAllCars());
+            return Ok(await _rentService.GetAllCars());
         }
 
         [HttpGet]
         [Route("availableCars")]
-        public ActionResult<IEnumerable<Car>> GetAvaibleCars([FromBody]DateFromToDTO dateFromTo)
+        public async Task<ActionResult<IEnumerable<Car>>> GetAvaibleCars([FromBody]DateFromToDTO dateFromTo)
         {
             if (!ModelState.IsValid)
             {
                 return ValidationProblem(ModelState);
             }
-            return Ok(_rentService.GetAvailableCars(dateFromTo.PickUpDate, dateFromTo.ReturnDate));
+            return Ok(await _rentService.GetAvailableCars(dateFromTo.PickUpDate, dateFromTo.ReturnDate));
         }
 
         [HttpGet]
         [Route("rentals")]
-        public ActionResult<IEnumerable<ReservationDetailDTO>> GetAllRentals()
-        {          
-            return Ok(_rentService.GetAllReservation());
+        public async Task<ActionResult<IEnumerable<ReservationDetailDTO>>> GetAllRentals()
+        {
+            return Ok(await _rentService.GetAllReservation());
         }
 
         [HttpGet]
-        public ActionResult<ReservationDetailDTO> GetReservation([FromBody] ReservationDTO reservation)
+        public async Task<ActionResult<ReservationDetailDTO>> GetReservation([FromQuery] ReservationIndexDTO reservationIndexDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -56,7 +56,7 @@ namespace CarRentalApi.Controllers
 
             try
             {
-                var foundReservation = _rentService.GetReservation(reservation);
+                var foundReservation = await _rentService.GetReservation(reservationIndexDTO);
                 return Ok(foundReservation);
             }
             catch (ArgumentNullException)
@@ -69,8 +69,8 @@ namespace CarRentalApi.Controllers
             }
         }
 
-        [HttpPatch]
-        public ActionResult<ReservationDetailDTO> UpdateReservation([FromBody] Reservation reservation)
+        [HttpPut]
+        public async Task<ActionResult<ReservationDetailDTO>> UpdateReservation([FromQuery] ReservationIndexDTO reservationIndexDTO, [FromBody] Reservation reservation)
         {
             if (!ModelState.IsValid)
             {
@@ -79,7 +79,7 @@ namespace CarRentalApi.Controllers
 
             try
             {
-                var updatedReservation = _rentService.UpdateReservation(reservation);
+                var updatedReservation = await _rentService.UpdateReservation(reservationIndexDTO, reservation);
                 return Ok(updatedReservation);
             }
             catch (ArgumentNullException)
@@ -93,7 +93,7 @@ namespace CarRentalApi.Controllers
         }
 
         [HttpDelete]
-        public ActionResult RemoveReservation([FromBody] ReservationDTO reservation)
+        public async Task<ActionResult> RemoveReservation([FromQuery] ReservationIndexDTO reservationIndexDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -102,7 +102,7 @@ namespace CarRentalApi.Controllers
 
             try
             {
-                _rentService.RemoveReservation(reservation);
+                await _rentService.RemoveReservation(reservationIndexDTO);
                 return Ok("Reservation removed");
             }
             catch (ArgumentNullException)
@@ -116,13 +116,14 @@ namespace CarRentalApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult<ReservationDetailDTO> RentCar([FromBody] Reservation reservation)
+        public async Task<ActionResult<ReservationDetailDTO>> RentCar([FromBody] Reservation reservation)
         {
             if (!ModelState.IsValid)
             {
                 return ValidationProblem(ModelState);
             }
-            return Created("api/Rent", _rentService.RentCar(reservation));
+            var result = await _rentService.RentCar(reservation);
+            return CreatedAtAction(nameof(GetReservation), new ReservationIndexDTO { ReservationNumber = result.ReservationNumber, Surname = result.Surname }, result);
         }
 
     }

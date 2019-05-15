@@ -17,62 +17,59 @@ namespace CarRentalApi.Services
         {
             _context = context;
         }
-        public List<Car> GetAllCars()
+        public async Task<List<Car>> GetAllCars()
         {
-            return _context.Cars.ToList();
+            return await _context.Cars.ToListAsync();
         }
-        public List<Car> GetAvailableCars(DateTime pickUpDate, DateTime returnDate)
+        public async Task<List<Car>> GetAvailableCars(DateTime pickUpDate, DateTime returnDate)
         {
-            var avaibleCars = _context.Cars.Where(car => !_context.Reservations.Any(r => r.CarId == car.Id && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate)).ToList();
+            var avaibleCars = await _context.Cars.Where(car => !_context.Reservations.Any(r => r.CarId == car.Id && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate)).ToListAsync();
             return avaibleCars;
         }
 
-        public ReservationDetailDTO RentCar(Reservation reservation)
+        public async Task<ReservationDetailDTO> RentCar(Reservation reservation)
         {
             _context.Reservations.Add(reservation);
-            _context.SaveChanges();
-            return ReservationToDTO(reservation);
+            await _context.SaveChangesAsync();
+            return await ReservationToDTO(reservation);
         }
 
-        public ReservationDetailDTO GetReservation(ReservationDTO reservation)
+        public async Task<ReservationDetailDTO> GetReservation(ReservationIndexDTO reservationIndexDTO)
         {
-            var foundReservation = FindReservation(reservation.ReservationNumber, reservation.Surname);
+            var foundReservation = await FindReservation(reservationIndexDTO);
             if (foundReservation == null)
                 throw new ArgumentNullException("Reservation does not exists");
-            return ReservationToDTO(foundReservation);
+            return await ReservationToDTO(foundReservation);
         }
-        public List<ReservationDetailDTO> GetAllReservation()
+        public async Task<List<ReservationDetailDTO>> GetAllReservation()
         {
-            return _context.Reservations.Include(c => c.Car).Select(ReservationToDTO).ToList();
+            var result = _context.Reservations.Include(c => c.Car).Select(ReservationToDTO);
+            await Task.WhenAll(result);
+            return result.Select(c => c.Result).ToList();
         }
 
-        public ReservationDetailDTO UpdateReservation(Reservation reservation)
+        public async Task<ReservationDetailDTO> UpdateReservation(ReservationIndexDTO reservationIndexDTO, Reservation reservation)
         {
-            var reservationToUpdate = FindReservation(reservation.ReservationNumber, reservation.Surname);
+            var reservationToUpdate = await FindReservation(reservationIndexDTO);
             if (reservationToUpdate == null)
                 throw new ArgumentNullException("Reservation does not exists");
-            reservationToUpdate.PickUpDate = reservation.PickUpDate;
-            reservationToUpdate.ReturnDate = reservation.ReturnDate;
-            reservationToUpdate.PickUpLocation = reservation.PickUpLocation;
-            reservationToUpdate.ReturnLocation = reservation.ReturnLocation ?? reservation.PickUpLocation;
-            reservationToUpdate.CarId = reservation.CarId;
-            _context.Reservations.Update(reservationToUpdate);
-            _context.SaveChanges();
-            return ReservationToDTO(reservationToUpdate);
+            _context.Entry(reservation).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return await ReservationToDTO(reservationToUpdate);
         }
 
-        public void RemoveReservation(ReservationDTO reservation)
+        public async Task RemoveReservation(ReservationIndexDTO reservationIndexDTO)
         {
-            var reservationToRemove = FindReservation(reservation.ReservationNumber, reservation.Surname);
+            var reservationToRemove = await FindReservation(reservationIndexDTO);
             if (reservationToRemove == null)
                 throw new ArgumentNullException("Reservation does not exists");
             _context.Reservations.Remove(reservationToRemove);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        private Reservation FindReservation(int reservationNumber, string surname)
+        private async Task<Reservation> FindReservation(ReservationIndexDTO reservationIndexDTO)
         {
-            return _context.Reservations.FirstOrDefault(r => r.ReservationNumber == reservationNumber && r.Surname == surname);
+            return await _context.Reservations.FirstOrDefaultAsync(r => r.ReservationNumber == reservationIndexDTO.ReservationNumber && r.Surname == reservationIndexDTO.Surname);
         }
 
         private double CalculateTotalPrice(int age, double price, double totalHours)
@@ -80,9 +77,9 @@ namespace CarRentalApi.Services
             double totalPrice = price * totalHours;
             return Math.Round(age > 25 ? totalPrice * 0.95 : totalPrice, 2);
         }
-        private ReservationDetailDTO ReservationToDTO(Reservation reservation)
+        private async Task<ReservationDetailDTO> ReservationToDTO(Reservation reservation)
         {
-            _context.Entry(reservation).Reference(c => c.Car).Load();
+            await _context.Entry(reservation).Reference(c => c.Car).LoadAsync();
             return new ReservationDetailDTO
             {
                 ReservationNumber = reservation.ReservationNumber,
