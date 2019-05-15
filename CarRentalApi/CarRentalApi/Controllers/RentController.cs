@@ -21,7 +21,6 @@ namespace CarRentalApi.Controllers
             _rentService = rentService;
         }
 
-        // GET: api/Rent
         [HttpGet]
         [Route("cars")]
         public ActionResult<IEnumerable<Car>> GetAvaibleCars([FromBody]DateFromToDTO dateFromTo)
@@ -33,9 +32,8 @@ namespace CarRentalApi.Controllers
             return Ok(_rentService.GetAvailableCars(dateFromTo.PickUpDate, dateFromTo.ReturnDate));
         }
 
-        // GET: api/Rent/5
         [HttpGet]
-        public ActionResult<Reservation> GetReservation([FromBody] ReservationIndexDTO reservationIndex)
+        public ActionResult<ReservationDetailDTO> GetReservation([FromBody] ReservationDTO reservation)
         {
             if (!ModelState.IsValid)
             {
@@ -44,16 +42,35 @@ namespace CarRentalApi.Controllers
 
             try
             {
-                return Ok(_rentService.GetReservation(reservationIndex.ReservationNumber, reservationIndex.Surname));
+                var foundReservation = _rentService.GetReservation(reservation);
+                return Ok(foundReservation);
             }
-            catch (InvalidOperationException)
+            catch (ArgumentNullException)
+            {
+                return NotFound("Reservation not found");
+            }
+        }
+        [HttpPatch]
+        public ActionResult<ReservationDetailDTO> UpdateReservation([FromBody] Reservation reservation)
+        {
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            try
+            {
+                var updatedReservation = _rentService.UpdateReservation(reservation);
+                return Ok(updatedReservation);
+            }
+            catch (ArgumentNullException)
             {
                 return NotFound("Reservation not found");
             }
         }
 
         [HttpDelete]
-        public ActionResult<Reservation> RemoveReservation([FromBody] ReservationIndexDTO reservationIndex)
+        public ActionResult RemoveReservation([FromBody] ReservationDTO reservation)
         {
             if (!ModelState.IsValid)
             {
@@ -62,18 +79,17 @@ namespace CarRentalApi.Controllers
 
             try
             {
-                _rentService.RemoveReservation(reservationIndex.ReservationNumber, reservationIndex.Surname);
+                _rentService.RemoveReservation(reservation);
                 return Ok("Reservation removed");
             }
-            catch (InvalidOperationException)
+            catch (ArgumentNullException)
             {
                 return NotFound("Reservation not found");
             }
         }
 
-        // POST: api/Rent
         [HttpPost]
-        public ActionResult<int> RentCar([FromBody] Reservation reservation)
+        public ActionResult<ReservationDetailDTO> RentCar([FromBody] Reservation reservation)
         {
             if (!ModelState.IsValid)
             {

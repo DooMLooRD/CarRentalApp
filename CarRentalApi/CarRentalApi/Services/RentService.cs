@@ -1,5 +1,6 @@
 ﻿using CarRentalApi.Database;
 using CarRentalApi.Database.Model;
+using CarRentalApi.DTOs;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -23,32 +24,70 @@ namespace CarRentalApi.Services
             return avaibleCars;
         }
 
-        public int RentCar(Reservation reservation)
+        public ReservationDetailDTO RentCar(Reservation reservation)
         {
             _context.Reservations.Add(reservation);
             _context.SaveChanges();
-            return reservation.ReservationNumber;
+            return ReservationToDTO(reservation);
         }
 
-        public Reservation GetReservation(int reservationNumber, string surname)
+        public ReservationDetailDTO GetReservation(ReservationDTO reservation)
         {
-            return _context.Reservations.First(r => r.ReservationNumber == reservationNumber && r.Surname == surname);
+            var foundReservation = FindReservation(reservation.ReservationNumber, reservation.Surname);
+            if (foundReservation == null)
+                throw new ArgumentNullException("Reservation does not exists");
+            return ReservationToDTO(foundReservation);
         }
-        public Reservation UpdateReservation(Reservation reservation)
+
+        public ReservationDetailDTO UpdateReservation(Reservation reservation)
         {
-            var reservationToUpdate = GetReservation(reservation.ReservationNumber, reservation.Surname);
+            var reservationToUpdate = FindReservation(reservation.ReservationNumber, reservation.Surname);
+            if (reservationToUpdate == null)
+                throw new ArgumentNullException("Reservation does not exists");
             reservationToUpdate.PickUpDate = reservation.PickUpDate;
             reservationToUpdate.ReturnDate = reservation.ReturnDate;
             reservationToUpdate.PickUpLocation = reservation.PickUpLocation;
-            reservationToUpdate.ReturnLocation = reservation.ReturnLocation;
+            reservationToUpdate.ReturnLocation = reservation.ReturnLocation ?? reservation.PickUpLocation;
+            reservationToUpdate.CarId = reservation.CarId;
             _context.Reservations.Update(reservationToUpdate);
             _context.SaveChanges();
-            return reservationToUpdate;
+            return ReservationToDTO(reservationToUpdate);
         }
-        public void RemoveReservation(int reservationNumber, string surname)
+
+        public void RemoveReservation(ReservationDTO reservation)
         {
-            _context.Reservations.Remove(GetReservation(reservationNumber, surname));
+            var reservationToRemove = FindReservation(reservation.ReservationNumber, reservation.Surname);
+            if (reservationToRemove == null)
+                throw new ArgumentNullException("Reservation does not exists");
+            _context.Reservations.Remove(reservationToRemove);
             _context.SaveChanges();
+        }
+
+        private Reservation FindReservation(int reservationNumber, string surname)
+        {
+            return _context.Reservations.FirstOrDefault(r => r.ReservationNumber == reservationNumber && r.Surname == surname);
+        }
+
+        private double CalculateTotalPrice(int age, double price, double totalHours)
+        {
+            double totalPrice = price * totalHours;
+            return Math.Round(age > 25 ? totalPrice * 0.95 : totalPrice, 2);
+        }
+        private ReservationDetailDTO ReservationToDTO(Reservation reservation)
+        {
+            _context.Entry(reservation).Reference(c => c.Car).Load();
+            return new ReservationDetailDTO
+            {
+                ReservationNumber = reservation.ReservationNumber,
+                PickUpDate = reservation.PickUpDate,
+                ReturnDate = reservation.ReturnDate,
+                PickUpLocation = reservation.PickUpLocation,
+                ReturnLocation = reservation.ReturnLocation,
+                Car = reservation.Car,
+                Surname = reservation.Surname,
+                Age = reservation.Age,
+                TotalPrice = CalculateTotalPrice(reservation.Age, reservation.Car.Price, (reservation.ReturnDate - reservation.PickUpDate).TotalHours)
+            };
         }
     }
 }

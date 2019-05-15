@@ -21,6 +21,7 @@ namespace CarRentalApi.Database
                 res.OwnsOne(c => c.PickUpLocation);
                 res.OwnsOne(c => c.ReturnLocation);
                 res.HasKey(c => c.ReservationNumber);
+                res.Property(c => c.Surname).IsRequired();
             });
             modelBuilder.Entity<Car>()
                 .HasData(
