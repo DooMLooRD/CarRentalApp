@@ -50,12 +50,17 @@ namespace CarRentalApi.Services
 
         public async Task<ReservationDetailDTO> UpdateReservation(ReservationIndexDTO reservationIndexDTO, Reservation reservation)
         {
+            if (reservationIndexDTO.ReservationNumber != reservation.ReservationNumber || reservationIndexDTO.Surname != reservation.Surname)
+            {
+                throw new ArgumentException("Given parameters does not match (ReservationNumber or Surname)");
+            }
             var reservationToUpdate = await FindReservation(reservationIndexDTO);
             if (reservationToUpdate == null)
                 throw new ArgumentNullException("Reservation does not exists");
+            _context.Entry(reservationToUpdate).State = EntityState.Detached;
             _context.Entry(reservation).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return await ReservationToDTO(reservationToUpdate);
+            return await ReservationToDTO(reservation);
         }
 
         public async Task RemoveReservation(ReservationIndexDTO reservationIndexDTO)

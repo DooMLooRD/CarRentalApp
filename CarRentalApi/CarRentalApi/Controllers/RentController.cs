@@ -86,6 +86,10 @@ namespace CarRentalApi.Controllers
             {
                 return NotFound("Reservation not found");
             }
+            catch (ArgumentException exception)
+            {
+                return BadRequest(exception.Message);
+            }
             catch (Exception exception)
             {
                 return BadRequest(exception.Message);
