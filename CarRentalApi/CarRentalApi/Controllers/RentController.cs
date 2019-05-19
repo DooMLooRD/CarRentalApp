@@ -126,8 +126,17 @@ namespace CarRentalApi.Controllers
             {
                 return ValidationProblem(ModelState);
             }
-            var result = await _rentService.RentCar(reservation);
-            return CreatedAtAction(nameof(GetReservation), new ReservationIndexDTO { ReservationNumber = result.ReservationNumber, Surname = result.Surname }, result);
+            try
+            {
+                var result = await _rentService.RentCar(reservation);
+                return CreatedAtAction(nameof(GetReservation), new ReservationIndexDTO { ReservationNumber = result.ReservationNumber, Surname = result.Surname }, result);
+            }
+            catch(Exception exception)
+            {
+                return BadRequest(exception.Message);
+
+            }
+
         }
 
     }

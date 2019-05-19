@@ -29,6 +29,8 @@ namespace CarRentalApi.Services
 
         public async Task<ReservationDetailDTO> RentCar(Reservation reservation)
         {
+            if (await CheckCarAvailability(reservation.CarId, reservation.PickUpDate, reservation.ReturnDate))
+                throw new ArgumentException("Selected Car is not available at this time");
             _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();
             return await ReservationToDTO(reservation);
@@ -57,6 +59,9 @@ namespace CarRentalApi.Services
             var reservationToUpdate = await FindReservation(reservationIndexDTO);
             if (reservationToUpdate == null)
                 throw new ArgumentNullException("Reservation does not exists");
+            if (await CheckCarAvailability(reservation.CarId, reservation.PickUpDate, reservation.ReturnDate, reservation.ReservationNumber))
+                throw new ArgumentException("Selected Car is not available at this time");
+
             _context.Entry(reservationToUpdate).State = EntityState.Detached;
             _context.Entry(reservation).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -70,6 +75,11 @@ namespace CarRentalApi.Services
                 throw new ArgumentNullException("Reservation does not exists");
             _context.Reservations.Remove(reservationToRemove);
             await _context.SaveChangesAsync();
+        }
+
+        private async Task<bool> CheckCarAvailability(int carId, DateTime pickUpDate, DateTime returnDate, int? exceptReservation = null)
+        {
+            return !await _context.Reservations.AnyAsync(r => r.CarId == carId && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate && exceptReservation != null ? exceptReservation.Value != r.ReservationNumber : true);
         }
 
         private async Task<Reservation> FindReservation(ReservationIndexDTO reservationIndexDTO)
