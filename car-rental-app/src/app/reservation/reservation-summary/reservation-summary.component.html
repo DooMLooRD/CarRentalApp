@@ -1,0 +1,148 @@
+<div class="container">
+  <div *ngIf="!isLoaded">
+    <strong class="text-white">Loading reservation summary... </strong>
+    <div
+      class="spinner-border text-light ml-auto"
+      role="status"
+      aria-hidden="true"
+    ></div>
+  </div>
+  <div *ngIf="isLoaded">
+    <div *ngIf="!manageReservation">
+      <div class="row justify-content-start">
+        <div class="col col-2">
+          <a
+            href=""
+            role="button"
+            class="btn btn-secondary"
+            [routerLink]="['/rent']"
+          >
+            Rent another Car
+          </a>
+        </div>
+        <div class="col col-4">
+          <a
+            href=""
+            role="button"
+            class="btn btn-secondary"
+            [routerLink]="['/manageRent']"
+          >
+            Manage your reservation
+          </a>
+        </div>
+      </div>
+      <div class="row">
+        <h2 class="text-white p-3">
+          This is your reservation, please save reservation number and surname
+          to manage your reservation.
+        </h2>
+      </div>
+      <div class="row">
+        <div class="col-xl">
+          <div class="form-group">
+            <label class="text-white" for="reservationNumber"
+              >Reservation Number:</label
+            >
+            <input
+              type="text"
+              [value]="reservation.reservationNumber"
+              class="form-control"
+              id="reservationNumber"
+              placeholder="Reservation Number"
+              readonly
+            />
+          </div>
+        </div>
+        <div class="col-xl">
+          <div class="form-group">
+            <label class="text-white" for="surname">Surname:</label>
+            <input
+              type="text"
+              [value]="reservation.surname"
+              class="form-control"
+              id="surname"
+              placeholder="Surname"
+              readonly
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl">
+        <div class="form-group">
+          <label class="text-white" for="age">Age:</label>
+          <input
+            type="number"
+            [value]="reservation.age"
+            class="form-control"
+            id="age"
+            placeholder="Age"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label class="text-white" for="pickUpDate">Pick Up Date:</label>
+          <input
+            placeholder="Pick Up Date"
+            class="form-control"
+            id="pickUpDate"
+            [value]="reservation.pickUpDate"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label class="text-white" for="returnDate">Return Date:</label>
+          <input
+            placeholder="Return Date"
+            class="form-control"
+            id="returnDate"
+            [value]="reservation.returnDate"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label class="text-white" for="pickUpLocation"
+            >Pick Up Location:</label
+          >
+          <input
+            placeholder="Pick Up Location"
+            class="form-control"
+            id="pickUpLocation"
+            [value]="reservation.pickUpLocation.name"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label class="text-white" for="returnLocation"
+            >Return Location:</label
+          >
+          <input
+            placeholder="Return Location"
+            class="form-control"
+            id="returnLocation"
+            [value]="reservation.returnLocation.name"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label class="text-white" for="totalPrice">Total Price:</label>
+          <input
+            placeholder="Total Price"
+            class="form-control"
+            id="totalPrice"
+            [value]="reservation.totalPrice"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label class="text-white" for="car">Chosen Car:</label>
+          <app-choose-car-detail
+            id="car"
+            [car]="reservation.car"
+          ></app-choose-car-detail>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
