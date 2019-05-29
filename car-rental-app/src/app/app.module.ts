@@ -14,6 +14,7 @@ import { CreateReservationComponent } from './reservation/create-reservation/cre
 import { ChooseCarComponent } from './reservation/create-reservation/choose-car/choose-car.component';
 import { ChooseCarDetailComponent } from './reservation/create-reservation/choose-car/choose-car-detail/choose-car-detail.component';
 import { ReservationSummaryComponent } from './reservation/reservation-summary/reservation-summary.component';
+import { ManageReservationComponent } from './reservation/manage-reservation/manage-reservation.component';
 
 
 const appRoutes: Routes = [
@@ -21,7 +22,12 @@ const appRoutes: Routes = [
   { path: "cars", component: CarsComponent },
   { path: "rent", component: CreateReservationComponent },
   { path: "rentSummary", component: ReservationSummaryComponent },
-
+  {
+    path: "manageRent", component: ManageReservationComponent, children: [
+      { path: "rentDetail", component: ReservationSummaryComponent, data: { manageReservation: true } },
+      { path: "editRent", component: CreateReservationComponent, data: { updateMode: true } },
+    ]
+  },
 ];
 
 @NgModule({
@@ -32,7 +38,8 @@ const appRoutes: Routes = [
     CreateReservationComponent,
     ChooseCarComponent,
     ChooseCarDetailComponent,
-    ReservationSummaryComponent
+    ReservationSummaryComponent,
+    ManageReservationComponent
   ],
   imports: [
     BrowserModule,

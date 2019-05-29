@@ -1,0 +1,106 @@
+<div class="container">
+  <div class="row">
+    <h2 class="text-white p-3">
+      Type your Reservation Number and Surname to manage your reservation.
+    </h2>
+  </div>
+  <div class="row">
+    <div class="col-xl">
+      <div class="form-group">
+        <label class="text-white" for="reservationNumber"
+          >Reservation Number:</label
+        >
+        <input
+          type="text"
+          [(ngModel)]="reservationInput.reservationNumber"
+          class="form-control"
+          id="reservationNumber"
+          placeholder="Reservation Number"
+        />
+      </div>
+    </div>
+    <div class="col-xl">
+      <div class="form-group">
+        <label class="text-white" for="surname">Surname:</label>
+        <input
+          type="text"
+          [(ngModel)]="reservationInput.surname"
+          class="form-control"
+          id="surname"
+          placeholder="Surname"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <button
+        class="btn btn-secondary mx-auto pl-5 pr-5 m-2"
+        (click)="checkReservation(content)"
+        *ngIf="!isChecking"
+      >
+        Check Reservation
+      </button>
+      <button class="btn btn-secondary mx-auto pl-5 pr-5 m-2" type="button" disabled *ngIf="isChecking">
+        <span
+          class="spinner-border spinner-border-sm"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        Fetching data...
+      </button>
+    </div>
+    <div class="col">
+      <button
+        class="btn btn-secondary mx-auto pl-5 pr-5 m-2"
+        (click)="updateReservation(content)"
+        *ngIf="!isUpdating"
+      >
+        Update Reservation
+      </button>
+      <button class="btn btn-secondary mx-auto pl-5 pr-5 m-2" type="button" disabled *ngIf="isUpdating">
+        <span
+          class="spinner-border spinner-border-sm"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        Fetching data...
+      </button>
+    </div>
+    <div class="col">
+      <button
+        class="btn btn-secondary mx-auto pl-5 pr-5 m-2"
+        (click)="removeReservation(content)"
+        *ngIf="!isRemoving"
+      >
+        Remove Reservation
+      </button>
+      <button class="btn btn-secondary mx-auto pl-5 pr-5 m-2" type="button" disabled *ngIf="isRemoving">
+        <span
+          class="spinner-border spinner-border-sm"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        Removing...
+      </button>
+    </div>
+  </div>
+</div>
+<router-outlet></router-outlet>
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{ modalModel.header }}</h4>
+  </div>
+  <div class="modal-body">
+    <p>{{ modalModel.message }}</p>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-outline-dark"
+      (click)="modal.close('Save click')"
+    >
+      Ok
+    </button>
+  </div>
+</ng-template>
