@@ -19,17 +19,26 @@ namespace CarRentalApi.Services
         }
         public async Task<List<Car>> GetAllCars()
         {
-            return await _context.Cars.ToListAsync();
+            return await _context.Cars.AsNoTracking().ToListAsync();
         }
-        public async Task<List<Car>> GetAvailableCars(DateTime pickUpDate, DateTime returnDate)
+        public async Task<List<Car>> GetAvailableCars(DateTime pickUpDate, DateTime returnDate, int? reservationNumber = null)
         {
-            var avaibleCars = await _context.Cars.Where(car => !_context.Reservations.Any(r => r.CarId == car.Id && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate)).ToListAsync();
+            List<Car> avaibleCars;
+            if (reservationNumber == null)
+                avaibleCars = await _context.Cars.AsNoTracking().Where(car => !_context.Reservations.AsNoTracking().Any(r => r.CarId == car.Id && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate)).ToListAsync();
+            else
+                avaibleCars = await _context.Cars.AsNoTracking().Where(car => !_context.Reservations.Where(r => r.ReservationNumber != reservationNumber.Value).AsNoTracking().Any(r => r.CarId == car.Id && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate)).ToListAsync();
             return avaibleCars;
+        }
+
+        public async Task<List<Location>> GetAllLocations()
+        {
+            return await _context.Locations.AsNoTracking().ToListAsync();
         }
 
         public async Task<ReservationDetailDTO> RentCar(Reservation reservation)
         {
-            if (await CheckCarAvailability(reservation.CarId, reservation.PickUpDate, reservation.ReturnDate))
+            if (!await CheckCarAvailability(reservation.CarId, reservation.PickUpDate, reservation.ReturnDate))
                 throw new ArgumentException("Selected Car is not available at this time");
             _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();
@@ -45,9 +54,13 @@ namespace CarRentalApi.Services
         }
         public async Task<List<ReservationDetailDTO>> GetAllReservation()
         {
-            var result = _context.Reservations.Include(c => c.Car).Select(ReservationToDTO);
-            await Task.WhenAll(result);
-            return result.Select(c => c.Result).ToList();
+            List<ReservationDetailDTO> result = new List<ReservationDetailDTO>();
+            var reservations = _context.Reservations;
+            foreach (var reservation in reservations)
+            {
+                result.Add(await ReservationToDTO(reservation));
+            }
+            return result;
         }
 
         public async Task<ReservationDetailDTO> UpdateReservation(ReservationIndexDTO reservationIndexDTO, Reservation reservation)
@@ -56,14 +69,11 @@ namespace CarRentalApi.Services
             {
                 throw new ArgumentException("Given parameters does not match (ReservationNumber or Surname)");
             }
-            var reservationToUpdate = await FindReservation(reservationIndexDTO);
-            if (reservationToUpdate == null)
+            if (await FindReservation(reservationIndexDTO, true) == null)
                 throw new ArgumentNullException("Reservation does not exists");
-            if (await CheckCarAvailability(reservation.CarId, reservation.PickUpDate, reservation.ReturnDate, reservation.ReservationNumber))
+            if (!await CheckCarAvailability(reservation.CarId, reservation.PickUpDate, reservation.ReturnDate, reservation.ReservationNumber))
                 throw new ArgumentException("Selected Car is not available at this time");
-
-            _context.Entry(reservationToUpdate).State = EntityState.Detached;
-            _context.Entry(reservation).State = EntityState.Modified;
+            _context.Update(reservation);
             await _context.SaveChangesAsync();
             return await ReservationToDTO(reservation);
         }
@@ -79,12 +89,21 @@ namespace CarRentalApi.Services
 
         private async Task<bool> CheckCarAvailability(int carId, DateTime pickUpDate, DateTime returnDate, int? exceptReservation = null)
         {
-            return !await _context.Reservations.AnyAsync(r => r.CarId == carId && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate && exceptReservation != null ? exceptReservation.Value != r.ReservationNumber : true);
+            if (await _context.Reservations.CountAsync() == 0)
+                return true;
+            if (exceptReservation == null)
+                return !await _context.Reservations.AsNoTracking().AnyAsync(r => r.CarId == carId && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate);
+            return !await _context.Reservations.Where(r => exceptReservation.Value != r.ReservationNumber).AsNoTracking().AnyAsync(r => r.CarId == carId && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate);
         }
 
-        private async Task<Reservation> FindReservation(ReservationIndexDTO reservationIndexDTO)
+        private async Task<Reservation> FindReservation(ReservationIndexDTO reservationIndexDTO, bool asNoTracking = false)
         {
+            if (asNoTracking)
+            {
+                return await _context.Reservations.AsNoTracking().FirstOrDefaultAsync(r => r.ReservationNumber == reservationIndexDTO.ReservationNumber && r.Surname == reservationIndexDTO.Surname);
+            }
             return await _context.Reservations.FirstOrDefaultAsync(r => r.ReservationNumber == reservationIndexDTO.ReservationNumber && r.Surname == reservationIndexDTO.Surname);
+
         }
 
         private double CalculateTotalPrice(int age, double price, double totalHours)
@@ -95,6 +114,8 @@ namespace CarRentalApi.Services
         private async Task<ReservationDetailDTO> ReservationToDTO(Reservation reservation)
         {
             await _context.Entry(reservation).Reference(c => c.Car).LoadAsync();
+            await _context.Entry(reservation).Reference(c => c.PickUpLocation).LoadAsync();
+            await _context.Entry(reservation).Reference(c => c.ReturnLocation).LoadAsync();
             return new ReservationDetailDTO
             {
                 ReservationNumber = reservation.ReservationNumber,

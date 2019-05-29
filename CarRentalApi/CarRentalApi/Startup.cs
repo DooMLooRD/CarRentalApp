@@ -30,8 +30,10 @@ namespace CarRentalApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddDbContext<CarRentalContext>(options => options.UseSqlServer(connString), ServiceLifetime.Singleton);
-            services.AddSingleton<RentService>();
+            services.AddDbContext<CarRentalContext>(options => options.UseSqlServer(connString), ServiceLifetime.Scoped);
+            services.AddScoped<RentService>();
+
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,7 +48,11 @@ namespace CarRentalApi
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            app.UseCors(c=> {
+                c.AllowAnyHeader();
+                c.AllowAnyMethod();
+                c.AllowAnyOrigin();
+            });
             app.UseHttpsRedirection();
             app.UseMvc();
         }

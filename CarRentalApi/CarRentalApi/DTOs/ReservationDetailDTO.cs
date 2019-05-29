@@ -23,3 +23,4 @@ namespace CarRentalApi.DTOs
         public double TotalPrice { get; set; }
     }
 }
+                                                                                                                                                                                                                                                                                   

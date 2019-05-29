@@ -22,6 +22,13 @@ namespace CarRentalApi.Controllers
         }
 
         [HttpGet]
+        [Route("locations")]
+        public async Task<ActionResult<IEnumerable<Location>>> GetAllLocations()
+        {
+            return Ok(await _rentService.GetAllLocations());
+        }
+
+        [HttpGet]
         [Route("cars")]
         public async Task<ActionResult<IEnumerable<Car>>> GetAllCars()
         {
@@ -30,7 +37,7 @@ namespace CarRentalApi.Controllers
 
         [HttpGet]
         [Route("availableCars")]
-        public async Task<ActionResult<IEnumerable<Car>>> GetAvaibleCars([FromBody]DateFromToDTO dateFromTo)
+        public async Task<ActionResult<IEnumerable<Car>>> GetAvaibleCars([FromQuery]DateFromToDTO dateFromTo)
         {
             if (!ModelState.IsValid)
             {
@@ -38,7 +45,16 @@ namespace CarRentalApi.Controllers
             }
             return Ok(await _rentService.GetAvailableCars(dateFromTo.PickUpDate, dateFromTo.ReturnDate));
         }
-
+        [HttpGet]
+        [Route("availableCars/{reservationNumber}")]
+        public async Task<ActionResult<IEnumerable<Car>>> GetAvaibleCarsForReservation(int reservationNumber, [FromQuery]DateFromToDTO dateFromTo)
+        {
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
+            return Ok(await _rentService.GetAvailableCars(dateFromTo.PickUpDate, dateFromTo.ReturnDate, reservationNumber));
+        }
         [HttpGet]
         [Route("rentals")]
         public async Task<ActionResult<IEnumerable<ReservationDetailDTO>>> GetAllRentals()
@@ -103,11 +119,10 @@ namespace CarRentalApi.Controllers
             {
                 return ValidationProblem(ModelState);
             }
-
             try
             {
                 await _rentService.RemoveReservation(reservationIndexDTO);
-                return Ok("Reservation removed");
+                return Ok();
             }
             catch (ArgumentNullException)
             {
@@ -131,7 +146,7 @@ namespace CarRentalApi.Controllers
                 var result = await _rentService.RentCar(reservation);
                 return CreatedAtAction(nameof(GetReservation), new ReservationIndexDTO { ReservationNumber = result.ReservationNumber, Surname = result.Surname }, result);
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 return BadRequest(exception.Message);
 

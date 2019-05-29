@@ -10,7 +10,11 @@ namespace CarRentalApi.Database.Model
     {
         public int ReservationNumber { get; set; }
 
+
+        public int PickUpLocationId { get; set; }
         public Location PickUpLocation { get; set; }
+
+        public int ReturnLocationId { get; set; }
         public Location ReturnLocation { get; set; }
 
         public DateTime PickUpDate { get; set; }
