@@ -1,0 +1,10 @@
+  <div class="row mb-5">
+    <h2 class="text-white mx-auto">Below are listed cars available in our Car Rentals</h2>
+  </div>
+  <div class="row justify-content-center">
+      <app-car-detail
+        class="col-xl-6 mb-5"
+        *ngFor="let car of cars"
+        [car]="car"
+      ></app-car-detail>
+  </div>
