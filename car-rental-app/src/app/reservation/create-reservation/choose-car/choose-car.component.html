@@ -16,10 +16,9 @@
   class="btn-group-vertical btn-group-toggle"
   ngbRadioGroup
   *ngIf="!isLoading && cars.length > 0"
-  [(ngModel)]="model.selectedCar"
 >
-  <label ngbButtonLabel class="btn btn-secondary m-2" *ngFor="let car of cars">
-    <input ngbButton type="radio" [value]="car" name="car" />
+  <label ngbButtonLabel class="btn btn-secondary m-2" *ngFor="let car of cars" [formGroup]="reservationForm">
+    <input ngbButton type="radio" [value]="car.id" name="carId" formControlName="carId" />
     <app-choose-car-detail [car]="car"></app-choose-car-detail>
   </label>
 </div>
