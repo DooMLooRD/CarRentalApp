@@ -1,0 +1,25 @@
+<h2 class="text-white">Choose Car:</h2>
+<div *ngIf="isLoading">
+  <strong class="text-white">Loading available cars... </strong>
+  <div
+    class="spinner-border text-light ml-auto"
+    role="status"
+    aria-hidden="true"
+  ></div>
+</div>
+
+<h4 class="text-white" *ngIf="!isLoading && cars.length == 0">
+  There is no avaiable cars at this time.
+</h4>
+
+<div
+  class="btn-group-vertical btn-group-toggle"
+  ngbRadioGroup
+  *ngIf="!isLoading && cars.length > 0"
+  [(ngModel)]="model.selectedCar"
+>
+  <label ngbButtonLabel class="btn btn-secondary m-2" *ngFor="let car of cars">
+    <input ngbButton type="radio" [value]="car" name="car" />
+    <app-choose-car-detail [car]="car"></app-choose-car-detail>
+  </label>
+</div>

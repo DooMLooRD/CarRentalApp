@@ -1,0 +1,142 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xl-5">
+      <div *ngIf="!updateMode">
+        <div class="form-group">
+          <label class="text-white" for="surname">Surname:</label>
+          <input
+            type="text"
+            [(ngModel)]="reservation.surname"
+            class="form-control"
+            id="surname"
+            placeholder="Surname"
+          />
+        </div>
+        <div class="form-group">
+          <label class="text-white" for="age">Age:</label>
+          <input
+            type="number"
+            [(ngModel)]="reservation.age"
+            class="form-control"
+            id="age"
+            placeholder="Age"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="text-white" for="pickUpDate">Pick Up Date:</label>
+        <input
+          placeholder="Pick Up Date"
+          class="form-control"
+          id="pickUpDate"
+          [(ngModel)]="reservation.pickUpDate"
+          (ngModelChange)="updateModel()"
+          [owlDateTimeTrigger]="pickUpD"
+          [owlDateTime]="pickUpD"
+        />
+        <owl-date-time #pickUpD></owl-date-time>
+      </div>
+      <div class="form-group">
+        <label class="text-white" for="returnDate">Return Date:</label>
+        <input
+          placeholder="Return Date"
+          class="form-control"
+          id="returnDate"
+          [(ngModel)]="reservation.returnDate"
+          (ngModelChange)="updateModel()"
+          [owlDateTimeTrigger]="returnD"
+          [owlDateTime]="returnD"
+        />
+        <owl-date-time #returnD></owl-date-time>
+      </div>
+      <div class="form-group">
+        <label class="text-white" for="pickUpLocationSelect"
+          >Pick Up Location</label
+        >
+        <select
+          class="form-control"
+          id="pickUpLocationSelect"
+          [(ngModel)]="reservation.pickUpLocationId"
+        >
+          <option *ngFor="let location of locations" [ngValue]="location.id">
+            {{ location.name }}
+          </option>
+        </select>
+      </div>
+      <div class="form-check mb-2">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          [(ngModel)]="returnLocationSameAsPickUp"
+          id="returnLocationSameAsPickUp"
+        />
+        <label
+          class="form-check-label text-white"
+          for="returnLocationSameAsPickUp"
+        >
+          Return Location is the same as Pick Up Location
+        </label>
+      </div>
+      <div class="form-group" *ngIf="!returnLocationSameAsPickUp">
+        <label class="text-white" for="returnLocationSelect"
+          >Return Location</label
+        >
+        <select
+          class="form-control"
+          id="returnLocationSelect"
+          [(ngModel)]="reservation.returnLocationId"
+        >
+          <option *ngFor="let location of locations" [ngValue]="location.id">
+            {{ location.name }}
+          </option>
+        </select>
+      </div>
+      <button
+        *ngIf="!updateMode && !isCreating"
+        type="button"
+        class="btn btn-secondary"
+        (click)="makeReservation()"
+      >
+        Make Reservation
+      </button>
+      <button
+        class="btn btn-secondary mx-auto pl-5 pr-5 m-2"
+        type="button"
+        disabled
+        *ngIf="!updateMode && isCreating"
+      >
+        <span
+          class="spinner-border spinner-border-sm"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        Fetching data...
+      </button>
+      <button
+        *ngIf="updateMode && !isUpdating"
+        type="button"
+        class="btn btn-secondary"
+        (click)="updateReservation()"
+      >
+        Confirm Update
+      </button>
+      <button
+        class="btn btn-secondary mx-auto pl-5 pr-5 m-2"
+        type="button"
+        disabled
+        *ngIf="updateMode && isUpdating"
+      >
+        <span
+          class="spinner-border spinner-border-sm"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        Fetching data...
+      </button>
+    </div>
+    <div class="col-xl-7">
+      <app-choose-car [model]="model"></app-choose-car>
+    </div>
+  </div>
+</div>
