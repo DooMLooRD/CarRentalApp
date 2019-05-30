@@ -4,5 +4,6 @@ To run Asp.net core api.
 3. Run WebApi using  IIS Express.
 
 To run Angular app.
-1. Download node modules by executing command "npm install".
-2. Run the app using command "ng serve"
+1. Go to car-rental-app catalog. 
+2. Download node modules by executing command "npm install".
+3. Run the app using command "ng serve"
