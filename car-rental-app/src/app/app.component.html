@@ -1,14 +1,29 @@
 <nav class="navbar navbar-dark bg-secondary navbar-expand-lg fixed-top">
+  <a class="navbar-brand" [routerLink]="['/']">Car Rental</a>
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
+    <span class="navbar-toggler-icon"></span>
+  </button>
   <ul class="navbar-nav mr-auto">
     <li
       class="nav-item"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-      <a class="nav-link" [routerLink]="['/cars']">Cars</a>
+      <a class="nav-link" [routerLink]="['/']">Home</a>
     </li>
     <li class="nav-item" routerLinkActive="active">
-      <a class="nav-link" [routerLink]="['/rent']">Rent</a>
+      <a class="nav-link" [routerLink]="['/cars']">Available Cars</a>
+    </li>
+    <li class="nav-item" routerLinkActive="active">
+      <a class="nav-link" [routerLink]="['/rent']">Rent Car</a>
     </li>
     <li class="nav-item" routerLinkActive="active">
       <a class="nav-link" [routerLink]="['/manageRent']">Manage Reservation</a>

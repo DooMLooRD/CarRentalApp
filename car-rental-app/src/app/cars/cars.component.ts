@@ -9,12 +9,14 @@ import { Car } from '../models/car';
 })
 export class CarsComponent implements OnInit {
   cars: Car[];
-
+  isLoading: boolean;
   constructor(private carService: CarService) { }
 
   ngOnInit() {
+    this.isLoading = true;
     this.carService.getAllCars().subscribe((res) => {
       this.cars = res;
+      this.isLoading = false;
     });
   }
 

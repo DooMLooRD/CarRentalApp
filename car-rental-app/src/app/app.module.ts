@@ -15,10 +15,11 @@ import { ChooseCarComponent } from './reservation/create-reservation/choose-car/
 import { ChooseCarDetailComponent } from './reservation/create-reservation/choose-car/choose-car-detail/choose-car-detail.component';
 import { ReservationSummaryComponent } from './reservation/reservation-summary/reservation-summary.component';
 import { ManageReservationComponent } from './reservation/manage-reservation/manage-reservation.component';
+import { HomeComponent } from './home/home.component';
 
 
 const appRoutes: Routes = [
-  { path: "", component: CarsComponent },
+  { path: "", component: HomeComponent },
   { path: "cars", component: CarsComponent },
   { path: "rent", component: CreateReservationComponent },
   { path: "rentSummary", component: ReservationSummaryComponent },
@@ -31,30 +32,33 @@ const appRoutes: Routes = [
 ];
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    CarsComponent,
-    CarDetailComponent,
-    CreateReservationComponent,
-    ChooseCarComponent,
-    ChooseCarDetailComponent,
-    ReservationSummaryComponent,
-    ManageReservationComponent
-  ],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    RouterModule.forRoot(appRoutes),
-    FormsModule,
-    OwlDateTimeModule,
-    OwlNativeDateTimeModule,
-    NgbButtonsModule,
-    NgbModalModule,
-    BrowserAnimationsModule,
-    ReactiveFormsModule,
-    NgbTooltipModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+   declarations: [
+      AppComponent,
+      CarsComponent,
+      CarDetailComponent,
+      CreateReservationComponent,
+      ChooseCarComponent,
+      ChooseCarDetailComponent,
+      ReservationSummaryComponent,
+      ManageReservationComponent,
+      HomeComponent
+   ],
+   imports: [
+      BrowserModule,
+      HttpClientModule,
+      RouterModule.forRoot(appRoutes),
+      FormsModule,
+      OwlDateTimeModule,
+      OwlNativeDateTimeModule,
+      NgbButtonsModule,
+      NgbModalModule,
+      BrowserAnimationsModule,
+      ReactiveFormsModule,
+      NgbTooltipModule
+   ],
+   providers: [],
+   bootstrap: [
+      AppComponent
+   ]
 })
 export class AppModule { }

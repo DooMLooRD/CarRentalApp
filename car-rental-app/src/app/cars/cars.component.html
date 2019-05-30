@@ -1,10 +1,20 @@
-  <div class="row mb-5">
-    <h2 class="text-white mx-auto">Below are listed cars available in our Car Rentals</h2>
-  </div>
-  <div class="row justify-content-center">
-      <app-car-detail
-        class="col-xl-5 m-4 pr-0 pl-0 car"
-        *ngFor="let car of cars"
-        [car]="car"
-      ></app-car-detail>
-  </div>
+<div class="row mb-5">
+  <h2 class="text-white mx-auto">
+    Below are listed cars available in our Car Rentals
+  </h2>
+</div>
+<div class="justify-content-center row" *ngIf="isLoading">
+  <strong class="text-white mr-3">Loading available cars... </strong>
+  <div
+    class="spinner-border text-light"
+    role="status"
+    aria-hidden="true"
+  ></div>
+</div>
+<div class="row justify-content-center" *ngIf="!isLoading">
+  <app-car-detail
+    class="col-xl-5 m-4 pr-0 pl-0 car"
+    *ngFor="let car of cars"
+    [car]="car"
+  ></app-car-detail>
+</div>
