@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Car } from '../../models/car';
 import { Location } from '../../models/location';
 import { Reservation, InitReservation, ReservationDetail, detailToReservation } from '../../models/reservation';
 import { LocationService } from '../../services/location.service';
 import { ReservationService } from '../../services/reservation.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DataStorageService } from '../../services/data-storage.service';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-create-reservation',
@@ -29,13 +28,13 @@ export class CreateReservationComponent implements OnInit {
   ngOnInit() {
     this.reservationForm = new FormGroup({
       'reservationNumber': new FormControl(0),
-      'surname': new FormControl(""),
-      'age': new FormControl(0),
-      'carId': new FormControl(0),
-      'pickUpDate': new FormControl(new Date()),
-      'returnDate': new FormControl(new Date()),
-      'pickUpLocation': new FormControl(null),
-      'returnLocation': new FormControl(null)
+      'surname': new FormControl("", Validators.required),
+      'age': new FormControl(0, [Validators.required, Validators.min(18)]),
+      'carId': new FormControl(null, Validators.required),
+      'pickUpDate': new FormControl(new Date(), Validators.required),
+      'returnDate': new FormControl(new Date(), Validators.required),
+      'pickUpLocation': new FormControl(null, Validators.required),
+      'returnLocation': new FormControl(null, Validators.required)
     });
 
     this.locationService.getAllLocations().subscribe((res: Location[]) => {
@@ -54,7 +53,7 @@ export class CreateReservationComponent implements OnInit {
       'reservationNumber': reservation.reservationNumber,
       'surname': reservation.surname,
       'age': reservation.age,
-      'carId': reservation.carId,
+      'carId': null,
       'pickUpDate': reservation.pickUpDate,
       'returnDate': reservation.returnDate,
       'pickUpLocation': reservation.pickUpLocationId,

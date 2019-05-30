@@ -47,5 +47,6 @@ export class ChooseCarComponent implements OnInit {
         this.isLoading = false;
       });
     }
+    this.reservationForm.patchValue({ 'carId': null })
   }
 }

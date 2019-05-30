@@ -4,7 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
-import { NgbButtonsModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbButtonsModule, NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
@@ -51,7 +51,8 @@ const appRoutes: Routes = [
     NgbButtonsModule,
     NgbModalModule,
     BrowserAnimationsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgbTooltipModule
   ],
   providers: [],
   bootstrap: [AppComponent]

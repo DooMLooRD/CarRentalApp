@@ -4,44 +4,85 @@
       Type your Reservation Number and Surname to manage your reservation.
     </h2>
   </div>
-  <div class="row">
-    <div class="col-xl">
-      <div class="form-group">
-        <label class="text-white" for="reservationNumber"
-          >Reservation Number:</label
-        >
-        <input
-          type="text"
-          [(ngModel)]="reservationInput.reservationNumber"
-          class="form-control"
-          id="reservationNumber"
-          placeholder="Reservation Number"
-        />
+  <form #form="ngForm">
+    <div class="row">
+      <div class="col-xl">
+        <div class="form-group">
+          <label class="text-white" for="reservationNumber"
+            >Reservation Number:</label
+          >
+          <input
+            type="number"
+            name="reservationNumber"
+            [(ngModel)]="reservationInput.reservationNumber"
+            class="form-control"
+            id="reservationNumber"
+            placeholder="Reservation Number"
+            #reservationNumber="ngModel"
+            required
+          />
+          <div
+            *ngIf="
+              reservationNumber.invalid &&
+              (reservationNumber.dirty ||
+                reservationNumber.touched ||
+                reservationNumber.pristine)
+            "
+            class="alert alert-dark"
+            role="alert"
+          >
+            <div *ngIf="!!reservationNumber.errors?.required">
+              Reservation number is required!
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl">
+        <div class="form-group">
+          <label class="text-white" for="surname">Surname:</label>
+          <input
+            type="text"
+            name="surname"
+            [(ngModel)]="reservationInput.surname"
+            class="form-control"
+            id="surname"
+            placeholder="Surname"
+            #surname="ngModel"
+            required
+          />
+          <div
+            *ngIf="
+              surname.invalid &&
+              (surname.dirty || surname.touched || surname.pristine)
+            "
+            class="alert alert-dark"
+            role="alert"
+          >
+            <div *ngIf="!!surname.errors?.required">
+              Surname is required!
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="col-xl">
-      <div class="form-group">
-        <label class="text-white" for="surname">Surname:</label>
-        <input
-          type="text"
-          [(ngModel)]="reservationInput.surname"
-          class="form-control"
-          id="surname"
-          placeholder="Surname"
-        />
-      </div>
-    </div>
-  </div>
+  </form>
+
   <div class="row">
     <div class="col">
       <button
         class="btn btn-secondary mx-auto pl-5 pr-5 m-2"
         (click)="checkReservation(content)"
         *ngIf="!isChecking"
+        [disabled]="form.invalid"
       >
         Check Reservation
       </button>
-      <button class="btn btn-secondary mx-auto pl-5 pr-5 m-2" type="button" disabled *ngIf="isChecking">
+      <button
+        class="btn btn-secondary mx-auto pl-5 pr-5 m-2"
+        type="button"
+        disabled
+        *ngIf="isChecking"
+      >
         <span
           class="spinner-border spinner-border-sm"
           role="status"
@@ -55,10 +96,16 @@
         class="btn btn-secondary mx-auto pl-5 pr-5 m-2"
         (click)="updateReservation(content)"
         *ngIf="!isUpdating"
+        [disabled]="form.invalid"
       >
         Update Reservation
       </button>
-      <button class="btn btn-secondary mx-auto pl-5 pr-5 m-2" type="button" disabled *ngIf="isUpdating">
+      <button
+        class="btn btn-secondary mx-auto pl-5 pr-5 m-2"
+        type="button"
+        disabled
+        *ngIf="isUpdating"
+      >
         <span
           class="spinner-border spinner-border-sm"
           role="status"
@@ -72,10 +119,16 @@
         class="btn btn-secondary mx-auto pl-5 pr-5 m-2"
         (click)="removeReservation(content)"
         *ngIf="!isRemoving"
+        [disabled]="form.invalid"
       >
         Remove Reservation
       </button>
-      <button class="btn btn-secondary mx-auto pl-5 pr-5 m-2" type="button" disabled *ngIf="isRemoving">
+      <button
+        class="btn btn-secondary mx-auto pl-5 pr-5 m-2"
+        type="button"
+        disabled
+        *ngIf="isRemoving"
+      >
         <span
           class="spinner-border spinner-border-sm"
           role="status"
@@ -86,6 +139,7 @@
     </div>
   </div>
 </div>
+<hr>
 <router-outlet></router-outlet>
 <ng-template #content let-modal>
   <div class="modal-header">

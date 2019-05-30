@@ -16,9 +16,27 @@
   class="btn-group-vertical btn-group-toggle"
   ngbRadioGroup
   *ngIf="!isLoading && cars.length > 0"
+  [formGroup]="reservationForm"
 >
-  <label ngbButtonLabel class="btn btn-secondary m-2" *ngFor="let car of cars" [formGroup]="reservationForm">
-    <input ngbButton type="radio" [value]="car.id" name="carId" formControlName="carId" />
+  <div
+    *ngIf="
+      reservationForm.get('carId').invalid &&
+      (reservationForm.get('carId').dirty ||
+        reservationForm.get('carId').touched ||
+        reservationForm.get('carId').pristine)
+    "
+    class="alert alert-dark m-2"
+  >
+    Car must be selected!
+  </div>
+  <label ngbButtonLabel class="btn btn-secondary m-2 shadow rounded" *ngFor="let car of cars">
+    <input
+      ngbButton
+      type="radio"
+      [value]="car.id"
+      name="carId"
+      formControlName="carId"
+    />
     <app-choose-car-detail [car]="car"></app-choose-car-detail>
   </label>
 </div>

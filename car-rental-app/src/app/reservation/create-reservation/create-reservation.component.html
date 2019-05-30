@@ -12,6 +12,20 @@
               placeholder="Surname"
               formControlName="surname"
             />
+            <div
+              *ngIf="
+                reservationForm.get('surname').invalid &&
+                (reservationForm.get('surname').dirty ||
+                  reservationForm.get('surname').touched ||
+                  reservationForm.get('surname').pristine)
+              "
+              class="alert alert-dark"
+              role="alert"
+            >
+              <div *ngIf="!!reservationForm.get('surname').errors?.required">
+                Name is required!
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label class="text-white" for="age">Age:</label>
@@ -22,6 +36,23 @@
               placeholder="Age"
               formControlName="age"
             />
+            <div
+              *ngIf="
+                reservationForm.get('age').invalid &&
+                (reservationForm.get('age').dirty ||
+                  reservationForm.get('age').touched ||
+                  reservationForm.get('age').pristine)
+              "
+              class="alert alert-dark"
+              role="alert"
+            >
+              <div *ngIf="!!reservationForm.get('age').errors?.required">
+                Age is required!
+              </div>
+              <div *ngIf="!!reservationForm.get('age').errors?.min">
+                Age must be greater or equal 18!
+              </div>
+            </div>
           </div>
         </div>
 
@@ -32,10 +63,27 @@
             class="form-control"
             id="pickUpDate"
             formControlName="pickUpDate"
+            [max]="reservationForm.get('returnDate').value"
             [owlDateTimeTrigger]="pickUpD"
             [owlDateTime]="pickUpD"
           />
           <owl-date-time #pickUpD></owl-date-time>
+          <div
+            *ngIf="
+              reservationForm.get('pickUpDate').invalid &&
+              (reservationForm.get('pickUpDate').dirty ||
+                reservationForm.get('pickUpDate').touched ||
+                reservationForm.get('pickUpDate').pristine)
+            "
+            class="alert alert-dark"
+            role="alert"
+          >
+            <div
+              *ngIf="!!reservationForm.get('pickUpDate').errors?.owlDateTimeMax"
+            >
+              Return date must be greater or equal pick up date!
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <label class="text-white" for="returnDate">Return Date:</label>
@@ -43,11 +91,28 @@
             placeholder="Return Date"
             class="form-control"
             id="returnDate"
+            [min]="reservationForm.get('pickUpDate').value"
             formControlName="returnDate"
             [owlDateTimeTrigger]="returnD"
             [owlDateTime]="returnD"
           />
           <owl-date-time #returnD></owl-date-time>
+          <div
+            *ngIf="
+              reservationForm.get('returnDate').invalid &&
+              (reservationForm.get('returnDate').dirty ||
+                reservationForm.get('returnDate').touched ||
+                reservationForm.get('returnDate').pristine)
+            "
+            class="alert alert-dark"
+            role="alert"
+          >
+            <div
+              *ngIf="!!reservationForm.get('returnDate').errors?.owlDateTimeMin"
+            >
+              Return date must be greater or equal pick up date!
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <label class="text-white" for="pickUpLocationSelect"
@@ -96,6 +161,7 @@
           *ngIf="!updateMode && !isCreating"
           type="button"
           class="btn btn-secondary"
+          [disabled]="reservationForm.invalid"
           (click)="makeReservation()"
         >
           Make Reservation
@@ -117,6 +183,7 @@
           *ngIf="updateMode && !isUpdating"
           type="button"
           class="btn btn-secondary"
+          [disabled]="reservationForm.invalid"
           (click)="updateReservation()"
         >
           Confirm Update

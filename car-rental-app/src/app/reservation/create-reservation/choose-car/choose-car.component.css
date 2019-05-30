@@ -2,3 +2,7 @@ label.active {
   background-color: #000000 !important;
   border-color: #000000 !important;
 }
+.alert{
+  padding-bottom: 0.35rem;
+  padding-top: 0.35rem;
+}
