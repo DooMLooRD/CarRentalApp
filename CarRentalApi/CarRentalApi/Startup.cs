@@ -18,7 +18,6 @@ namespace CarRentalApi
 {
     public class Startup
     {
-        private const string connString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=CarRentalDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -30,7 +29,7 @@ namespace CarRentalApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddDbContext<CarRentalContext>(options => options.UseSqlServer(connString), ServiceLifetime.Scoped);
+            services.AddDbContext<CarRentalContext>(options => options.UseSqlServer(Configuration.GetConnectionString("CarRentalDb")), ServiceLifetime.Scoped);
             services.AddScoped<RentService>();
 
             services.AddCors();
