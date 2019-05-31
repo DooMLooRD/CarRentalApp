@@ -25,9 +25,9 @@ namespace CarRentalApi.Services
         {
             List<Car> avaibleCars;
             if (reservationNumber == null)
-                avaibleCars = await _context.Cars.AsNoTracking().Where(car => !_context.Reservations.AsNoTracking().Any(r => r.CarId == car.Id && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate)).ToListAsync();
+                avaibleCars = await _context.Cars.AsNoTracking().Where(car => !_context.Reservations.AsNoTracking().Any(r => r.CarId == car.Id && r.PickUpDate.ToUniversalTime() <= returnDate.ToUniversalTime() && r.ReturnDate.ToUniversalTime() >= pickUpDate.ToUniversalTime())).ToListAsync();
             else
-                avaibleCars = await _context.Cars.AsNoTracking().Where(car => !_context.Reservations.Where(r => r.ReservationNumber != reservationNumber.Value).AsNoTracking().Any(r => r.CarId == car.Id && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate)).ToListAsync();
+                avaibleCars = await _context.Cars.AsNoTracking().Where(car => !_context.Reservations.Where(r => r.ReservationNumber != reservationNumber.Value).AsNoTracking().Any(r => r.CarId == car.Id && r.PickUpDate.ToUniversalTime() <= returnDate.ToUniversalTime() && r.ReturnDate.ToUniversalTime() >= pickUpDate.ToUniversalTime())).ToListAsync();
             return avaibleCars;
         }
 
@@ -92,8 +92,8 @@ namespace CarRentalApi.Services
             if (await _context.Reservations.CountAsync() == 0)
                 return true;
             if (exceptReservation == null)
-                return !await _context.Reservations.AsNoTracking().AnyAsync(r => r.CarId == carId && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate);
-            return !await _context.Reservations.Where(r => exceptReservation.Value != r.ReservationNumber).AsNoTracking().AnyAsync(r => r.CarId == carId && r.PickUpDate <= returnDate && r.ReturnDate >= pickUpDate);
+                return !await _context.Reservations.AsNoTracking().AnyAsync(r => r.CarId == carId && r.PickUpDate.ToUniversalTime() <= returnDate.ToUniversalTime() && r.ReturnDate.ToUniversalTime() >= pickUpDate.ToUniversalTime());
+            return !await _context.Reservations.Where(r => exceptReservation.Value != r.ReservationNumber).AsNoTracking().AnyAsync(r => r.CarId == carId && r.PickUpDate.ToUniversalTime() <= returnDate.ToUniversalTime() && r.ReturnDate.ToUniversalTime() >= pickUpDate.ToUniversalTime());
         }
 
         private async Task<Reservation> FindReservation(ReservationIndexDTO reservationIndexDTO, bool asNoTracking = false)
